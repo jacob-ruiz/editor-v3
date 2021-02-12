@@ -14,9 +14,12 @@ export default function App() {
     { id: uuid(), text: 'Invite friends over' },
     { id: uuid(), text: 'Fix the TV' },
   ]);
+  const [showDoc, setShowDoc] = useState(true);
+
   const [activeItem, setActiveItem] = useState(items[0]);
   useEffect(() => {
     setActiveItem(items[0]);
+    setShowDoc(true);
   }, [items]);
 
   function addItem() {
@@ -56,10 +59,64 @@ export default function App() {
         </div>
       </div>
       {/* Middle */}
+
       <div className="center-panel">
-        <h2>{activeItem.text}</h2>
-        <button onClick={() => removeItem(activeItem.id)}>Delete</button>
+        <div className="doc-container">
+          <TransitionGroup className="doc-page">
+            {items.map(({ id, text }) => {
+              if (id === activeItem.id) {
+                return (
+                  <CSSTransition
+                    // in={false}
+                    key={id}
+                    timeout={1000}
+                    classNames="doc"
+                    unmountOnExit
+                    onEntered={() => console.log('entered')}
+                    onEnter={() => console.log('enter')}
+                    onExited={() => console.log('exited')}
+                  >
+                    <div className="doc-content">
+                      <h2>{activeItem.text}</h2>
+                      <button
+                        onClick={() => {
+                          removeItem(activeItem.id);
+                          setShowDoc(false);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </CSSTransition>
+                );
+              }
+            })}
+          </TransitionGroup>
+        </div>
       </div>
+      {/* <div className="center-panel">
+        <CSSTransition
+          in={showDoc}
+          timeout={500}
+          classNames="doc"
+          unmountOnExit
+          onEntered={() => console.log('entered')}
+          onEnter={() => console.log('enter')}
+          onExited={() => console.log('exited')}
+        >
+          <div>
+            <h2>{activeItem.text}</h2>
+            <button
+              onClick={() => {
+                removeItem(activeItem.id);
+                setShowDoc(false);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </CSSTransition>
+      </div> */}
     </div>
   );
 }

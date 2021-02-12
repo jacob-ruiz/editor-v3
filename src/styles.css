@@ -1,5 +1,7 @@
 .App {
   font-family: sans-serif;
+  display: flex;
+  flex-direction: row;
 }
 
 .remove-btn {
@@ -19,4 +21,33 @@
 .item-exit-active {
   opacity: 0;
   transition: opacity 500ms ease-in;
+}
+
+.doc-enter {
+  opacity: 0;
+}
+.doc-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in 500ms;
+}
+.doc-exit {
+  opacity: 1;
+}
+.doc-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}
+
+.center-panel {
+  position: relative;
+}
+
+.doc-container {
+  position: relative;
+}
+
+.doc-content {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
