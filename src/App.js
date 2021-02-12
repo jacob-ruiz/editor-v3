@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import uuid from 'uuid';
 import './styles.css';
@@ -14,6 +14,10 @@ export default function App() {
     { id: uuid(), text: 'Invite friends over' },
     { id: uuid(), text: 'Fix the TV' },
   ]);
+  const [activeItem, setActiveItem] = useState(items[0]);
+  useEffect(() => {
+    setActiveItem(items[0]);
+  }, [items]);
 
   function addItem() {
     // const text = prompt('Enter some text');
@@ -22,6 +26,18 @@ export default function App() {
       setItems((items) => [{ id: uuid(), text }, ...items]);
     }
   }
+
+  function removeItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+
+  function updateActiveItem(id) {
+    const [newItem] = items.filter((item) => {
+      return item.id === id;
+    });
+    setActiveItem(newItem);
+  }
+
   return (
     <div className="App">
       <div className="leftPanel">
@@ -30,17 +46,9 @@ export default function App() {
           <TransitionGroup className="todo-list">
             {items.map(({ id, text }) => (
               <CSSTransition key={id} timeout={500} classNames="item">
-                <div>
+                <div onClick={() => updateActiveItem(id)}>
                   {text}
-                  <button
-                    onClick={() => {
-                      setItems((items) =>
-                        items.filter((item) => item.id !== id)
-                      );
-                    }}
-                  >
-                    &times;
-                  </button>
+                  <button onClick={() => removeItem(id)}>&times;</button>
                 </div>
               </CSSTransition>
             ))}
@@ -49,7 +57,7 @@ export default function App() {
       </div>
       {/* Middle */}
       <div className="center-panel">
-        <h2></h2>
+        <h2>{activeItem.text}</h2>
       </div>
     </div>
   );
