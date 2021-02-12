@@ -58,6 +58,7 @@ export default function App() {
       {/* Middle */}
       <div className="center-panel">
         <h2>{activeItem.text}</h2>
+        <button onClick={() => removeItem(activeItem.id)}>Delete</button>
       </div>
     </div>
   );
