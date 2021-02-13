@@ -72,6 +72,7 @@ export default function App() {
         updatedItem.body = e.target.value;
         updatedItem.lastUpdated = new Date(Date.now());
         console.log(e.target.value);
+        setActiveItem(updatedItem);
         return updatedItem;
       } else {
         return item;
