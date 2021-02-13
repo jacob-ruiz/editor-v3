@@ -67,7 +67,7 @@ export default function App() {
               if (id === activeItem.id) {
                 return (
                   <CSSTransition
-                    // in={false}
+                    in={showDoc}
                     key={id}
                     timeout={1000}
                     classNames="doc"
