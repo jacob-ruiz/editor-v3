@@ -4,6 +4,10 @@
   flex-direction: row;
 }
 
+button {
+  cursor: pointer;
+}
+
 .remove-btn {
   margin-right: 0.5rem;
 }
