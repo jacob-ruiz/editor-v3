@@ -9,12 +9,6 @@ import './styles.css';
 
 // https://kentcdodds.com/blog/dont-sync-state-derive-it
 
-/*
-- Active item = 0
-- Delete item 1
--
-*/
-
 export default function App() {
   const [items, setItems] = useState([
     {
@@ -43,12 +37,12 @@ export default function App() {
     },
   ]);
   const itemsSortedByLastUpdated = sortByLastUpdated(items);
-  const [showDoc, setShowDoc] = useState(true);
-
-  const [activeItem, setActiveItem] = useState(items[0]);
+  const [activeItemID, setActiveItemID] = useState(
+    itemsSortedByLastUpdated[0].id
+  );
+  const activeItem = getActiveItem(items, activeItemID);
 
   function addItem() {
-    // const text = prompt('Enter some text');
     const newItem = {
       id: uuid(),
       title: 'New Document',
@@ -57,30 +51,24 @@ export default function App() {
     };
 
     setItems((items) => [newItem, ...items]);
-
-    setActiveItem(itemsSortedByLastUpdated[0]);
+    setActiveItemID(newItem.id);
   }
+
+  useEffect(() => {
+    setActiveItemID(itemsSortedByLastUpdated[0].id);
+  }, [items.length]);
 
   function removeItem(id) {
     setItems((items) => items.filter((item) => item.id !== id));
-    setActiveItem(itemsSortedByLastUpdated[0]);
+    setActiveItemID(itemsSortedByLastUpdated[0].id);
   }
 
-  function updateActiveItem(id) {
-    const [newItem] = items.filter((item) => {
-      return item.id === id;
-    });
-    setActiveItem(newItem);
-  }
-
-  function handleDocumentBodyEdit(e) {
+  function handleDocumentEdit(e) {
     const newItems = items.map((item) => {
-      if (item.id === activeItem.id) {
+      if (item.id === activeItemID) {
         let updatedItem = { ...item };
-        updatedItem.body = e.target.value;
+        updatedItem[e.target.name] = e.target.value;
         updatedItem.lastUpdated = new Date(Date.now());
-        console.log(e.target.value);
-        setActiveItem(updatedItem);
         return updatedItem;
       } else {
         return item;
@@ -99,11 +87,11 @@ export default function App() {
               <CSSTransition key={id} timeout={500} classNames="item">
                 <button
                   style={{
-                    fontWeight: activeItem.id === id ? 'bold' : 'normal',
+                    fontWeight: activeItemID === id ? 'bold' : 'normal',
                     cursor: 'pointer',
                     display: 'block',
                   }}
-                  onClick={() => updateActiveItem(id)}
+                  onClick={() => setActiveItemID(id)}
                 >
                   {title}
                 </button>
@@ -117,11 +105,10 @@ export default function App() {
       <div className="center-panel">
         <div className="doc-container">
           <TransitionGroup className="doc-page">
-            {items.map(({ id, title }) => {
-              if (id === activeItem.id) {
+            {items.map(({ id }) => {
+              if (id === activeItemID) {
                 return (
                   <CSSTransition
-                    in={showDoc}
                     key={id}
                     timeout={1000}
                     classNames="doc"
@@ -134,26 +121,25 @@ export default function App() {
                     onExited={() => {
                       console.log('exited');
                       if (activeItem.id !== id) {
-                        setActiveItem(items[0]);
+                        setActiveItemID(itemsSortedByLastUpdated[0].id);
                       }
                     }}
                   >
                     <div className="doc-content">
-                      <h2>{activeItem.title}</h2>
+                      <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        value={activeItem.title}
+                        onChange={(e) => handleDocumentEdit(e)}
+                      />
                       <p>{activeItem.lastUpdated.toGMTString()}</p>
-                      <button
-                        onClick={() => {
-                          removeItem(activeItem.id);
-                          setShowDoc(false);
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <button onClick={() => removeItem(id)}>Delete</button>
                       <textarea
                         name="body"
                         id="body"
                         value={activeItem.body}
-                        onChange={(e) => handleDocumentBodyEdit(e)}
+                        onChange={(e) => handleDocumentEdit(e)}
                       >
                         {activeItem.body}
                       </textarea>
@@ -165,31 +151,15 @@ export default function App() {
           </TransitionGroup>
         </div>
       </div>
-      {/* <div className="center-panel">
-        <CSSTransition
-          in={showDoc}
-          timeout={500}
-          classNames="doc"
-          unmountOnExit
-          onEntered={() => console.log('entered')}
-          onEnter={() => console.log('enter')}
-          onExited={() => console.log('exited')}
-        >
-          <div>
-            <h2>{activeItem.text}</h2>
-            <button
-              onClick={() => {
-                removeItem(activeItem.id);
-                setShowDoc(false);
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </CSSTransition>
-      </div> */}
     </div>
   );
+}
+
+function getActiveItem(items, activeItemID) {
+  const [activeItem] = items.filter((item) => {
+    return item.id === activeItemID;
+  });
+  return activeItem;
 }
 
 function compareDates(a, b) {
