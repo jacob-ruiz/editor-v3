@@ -7,6 +7,8 @@ import './styles.css';
 
 // https://reactjs.org/tutorial/tutorial.html
 
+// https://kentcdodds.com/blog/dont-sync-state-derive-it
+
 /*
 - Active item = 0
 - Delete item 1
@@ -40,22 +42,28 @@ export default function App() {
       lastUpdated: new Date(Date.now()),
     },
   ]);
+  const itemsSortedByLastUpdated = sortByLastUpdated(items);
   const [showDoc, setShowDoc] = useState(true);
 
   const [activeItem, setActiveItem] = useState(items[0]);
 
   function addItem() {
     // const text = prompt('Enter some text');
-    const title = 'New Document';
-    if (title) {
-      setItems((items) => [{ id: uuid(), title }, ...items]);
-    }
-    setActiveItem(items[0]);
+    const newItem = {
+      id: uuid(),
+      title: 'New Document',
+      body: 'Lorem ipsum',
+      lastUpdated: new Date(Date.now()),
+    };
+
+    setItems((items) => [newItem, ...items]);
+
+    setActiveItem(itemsSortedByLastUpdated[0]);
   }
 
   function removeItem(id) {
     setItems((items) => items.filter((item) => item.id !== id));
-    setActiveItem(items[0]);
+    setActiveItem(itemsSortedByLastUpdated[0]);
   }
 
   function updateActiveItem(id) {
@@ -87,7 +95,7 @@ export default function App() {
         <button onClick={addItem}>Add item</button>
         <div>
           <TransitionGroup className="todo-list">
-            {items.map(({ id, title }) => (
+            {itemsSortedByLastUpdated.map(({ id, title }) => (
               <CSSTransition key={id} timeout={500} classNames="item">
                 <button
                   style={{
@@ -182,4 +190,20 @@ export default function App() {
       </div> */}
     </div>
   );
+}
+
+function compareDates(a, b) {
+  if (a.lastUpdated < b.lastUpdated) {
+    return 1;
+  }
+  if (a.lastUpdated > b.lastUpdated) {
+    return -1;
+  }
+  return 0;
+}
+
+function sortByLastUpdated(items) {
+  let itemsCopy = [...items];
+  let sortedItems = itemsCopy.sort(compareDates);
+  return sortedItems;
 }
