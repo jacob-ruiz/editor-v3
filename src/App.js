@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useDebugValue, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import uuid from 'uuid';
 import './styles.css';
@@ -16,24 +16,28 @@ export default function App() {
       title: 'Buy eggs',
       body: 'Lorem ipsum',
       lastUpdated: new Date(Date.now()),
+      lastUpdatedBy: 'Jacob Ruiz',
     },
     {
       id: uuid(),
       title: 'Pay bills',
       body: 'Lorem ipsum',
       lastUpdated: new Date(Date.now()),
+      lastUpdatedBy: 'Jacob Ruiz',
     },
     {
       id: uuid(),
       title: 'Invite friends over',
       body: 'Lorem ipsum',
       lastUpdated: new Date(Date.now()),
+      lastUpdatedBy: 'Jacob Ruiz',
     },
     {
       id: uuid(),
       title: 'Fix the TV',
       body: 'Lorem ipsum',
       lastUpdated: new Date(Date.now()),
+      lastUpdatedBy: 'Jacob Ruiz',
     },
   ]);
   const itemsSortedByLastUpdated = sortByLastUpdated(items);
@@ -41,6 +45,11 @@ export default function App() {
     itemsSortedByLastUpdated[0].id
   );
   const activeItem = getActiveItem(items, activeItemID);
+  const [itemIsExiting, setItemIsExiting] = useState(false);
+
+  useEffect(() => {
+    setActiveItemID(itemsSortedByLastUpdated[0].id);
+  }, [items.length]);
 
   function addItem() {
     const newItem = {
@@ -48,19 +57,15 @@ export default function App() {
       title: 'New Document',
       body: 'Lorem ipsum',
       lastUpdated: new Date(Date.now()),
+      lastUpdatedBy: 'Jacob Ruiz',
     };
 
     setItems((items) => [newItem, ...items]);
     setActiveItemID(newItem.id);
   }
 
-  useEffect(() => {
-    setActiveItemID(itemsSortedByLastUpdated[0].id);
-  }, [items.length]);
-
   function removeItem(id) {
     setItems((items) => items.filter((item) => item.id !== id));
-    setActiveItemID(itemsSortedByLastUpdated[0].id);
   }
 
   function handleDocumentEdit(e) {
@@ -83,20 +88,31 @@ export default function App() {
         <button onClick={addItem}>Add item</button>
         <div>
           <TransitionGroup className="todo-list">
-            {itemsSortedByLastUpdated.map(({ id, title }) => (
-              <CSSTransition key={id} timeout={500} classNames="item">
-                <button
-                  style={{
-                    fontWeight: activeItemID === id ? 'bold' : 'normal',
-                    cursor: 'pointer',
-                    display: 'block',
-                  }}
-                  onClick={() => setActiveItemID(id)}
+            {itemsSortedByLastUpdated.map(
+              ({ id, title, lastUpdated, lastUpdatedBy }) => (
+                <CSSTransition
+                  key={id}
+                  timeout={500}
+                  classNames="item"
+                  onExit={() => setItemIsExiting(true)}
+                  onExited={() => setItemIsExiting(false)}
                 >
-                  {title}
-                </button>
-              </CSSTransition>
-            ))}
+                  <button
+                    className={`item ${
+                      activeItemID === id && !itemIsExiting ? 'active' : null
+                    }`}
+                    onClick={() => setActiveItemID(id)}
+                  >
+                    <h4 className="item__title">{title}</h4>
+                    <div className="item__subtitle">
+                      <span>{lastUpdatedBy}</span>
+                      <span> • </span>
+                      <span>{lastUpdated.toDateString()}</span>
+                    </div>
+                  </button>
+                </CSSTransition>
+              )
+            )}
           </TransitionGroup>
         </div>
       </div>
@@ -105,7 +121,7 @@ export default function App() {
       <div className="center-panel">
         <div className="doc-container">
           <TransitionGroup className="doc-page">
-            {items.map(({ id }) => {
+            {itemsSortedByLastUpdated.map(({ id }) => {
               if (id === activeItemID) {
                 return (
                   <CSSTransition
