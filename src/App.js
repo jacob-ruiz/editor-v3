@@ -9,6 +9,11 @@ import './styles.css';
 
 // https://kentcdodds.com/blog/dont-sync-state-derive-it
 
+/*
+  TODO:
+  - Try positioning items manually using transformY so we can animate to top of list on edit. (Maybe this is smarter to do at the end? This is a fairly radical approach and not very maintainable)
+*/
+
 export default function App() {
   const [items, setItems] = useState([
     {
@@ -136,9 +141,9 @@ export default function App() {
                     onExit={() => console.log('exit')}
                     onExited={() => {
                       console.log('exited');
-                      if (activeItem.id !== id) {
-                        setActiveItemID(itemsSortedByLastUpdated[0].id);
-                      }
+                      // if (activeItem.id !== id) {
+                      //   setActiveItemID(itemsSortedByLastUpdated[0].id);
+                      // }
                     }}
                   >
                     <div className="doc-content">
