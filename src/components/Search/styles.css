@@ -1,0 +1,29 @@
+.searchContainer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 2px;
+  align-items: center;
+  height: 36px;
+  background: #fafafa;
+  padding: 0 8px;
+  border-radius: 999px;
+  transition: background 80ms;
+}
+
+.searchContainer:hover {
+  background: #eff0f2;
+}
+
+.searchInput {
+  font-family: Poppins;
+  font-size: 12px;
+  line-height: 1;
+  color: black;
+  outline: none;
+  border: none;
+  background: none;
+}
+
+.searchInput::placeholder {
+  color: #5a677c;
+}
