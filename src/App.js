@@ -1,7 +1,9 @@
-import React, { useDebugValue, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import uuid from 'uuid';
+import ReactTooltip from 'react-tooltip';
 import Search from './components/Search/Search';
+import Icons from './icons';
 import './styles.css';
 
 // http://reactcommunity.org/react-transition-group/transition-group
@@ -16,6 +18,15 @@ import './styles.css';
 */
 
 export default function App() {
+  // UI state
+  const [leftPanel, setLeftPanel] = useState(true);
+  let leftPanelOpen = leftPanel ? 'open' : 'closed';
+
+  function toggleLeftPanel() {
+    setLeftPanel(!leftPanel);
+  }
+
+  // Data
   const [items, setItems] = useState([
     {
       id: uuid(),
@@ -98,145 +109,229 @@ export default function App() {
   }
 
   return (
-    <div className="App">
-      <div className="left-panel">
-        <div className="left-panel__header">
-          <h3 className="left-panel__title">Docs</h3>
-          <button className="button-icon-with-label" onClick={addItem}>
-            <NewDoc />
-            New
-          </button>
-        </div>
-        <div className="left-panel__search-container">
-          <Search />
-        </div>
-        <div className="left-panel__filter-container">
-          <div className="left-panel__filter">
-            My Docs
-            <ArrowDown />
+    <div id="layout">
+      <div id="left" className={leftPanelOpen}>
+        <ToggleButton onClick={toggleLeftPanel} leftPanel={leftPanel} />
+        <NewDocButton onClick={addItem} leftPanel={leftPanel} />
+        <div className={`left-panel ${leftPanelOpen}`}>
+          <div className="left-panel__header">
+            <h3 className="left-panel__title">Docs</h3>
+            <button className="button-icon-with-label" onClick={addItem}>
+              <NewDoc />
+              New
+            </button>
           </div>
-          <div className="left-panel__sort">
-            <span>Last Edited</span>
-            <Sort />
+          <div className="left-panel__search-container">
+            <Search />
           </div>
-        </div>
-        <div>
-          <TransitionGroup className="list">
-            {itemsSortedByLastUpdated.map(
-              ({ id, title, lastUpdated, lastUpdatedBy, favorite }) => (
-                <CSSTransition
-                  key={id}
-                  timeout={200}
-                  classNames="item"
-                  onExit={() => setItemIsExiting(true)}
-                  onExited={() => setItemIsExiting(false)}
-                >
-                  <button
-                    className={`item ${
-                      activeItemID === id && !itemIsExiting ? 'active' : null
-                    }`}
-                    onClick={() => setActiveItemID(id)}
+          <div className="left-panel__filter-container">
+            <div className="left-panel__filter">
+              My Docs
+              <ArrowDown />
+            </div>
+            <div className="left-panel__sort">
+              <span>Last Edited</span>
+              <Sort />
+            </div>
+          </div>
+          <div>
+            <TransitionGroup className="list">
+              {itemsSortedByLastUpdated.map(
+                ({ id, title, lastUpdated, lastUpdatedBy, favorite }) => (
+                  <CSSTransition
+                    key={id}
+                    timeout={200}
+                    classNames="item"
+                    onExit={() => setItemIsExiting(true)}
+                    onExited={() => setItemIsExiting(false)}
                   >
-                    <div className="item__grid">
-                      <div className="item__star">
-                        <Star filled={favorite ? true : false} />
-                      </div>
-                      <div className="item__text-stack">
-                        <h4 className="item__title">
-                          {title ? title : 'Untitled Doc'}
-                        </h4>
-                        <div className="item__subtitle">
-                          <span>{lastUpdatedBy}</span>
-                          <span> • </span>
-                          <span>
-                            {timeDifference(new Date(Date.now()), lastUpdated)}
-                          </span>
+                    <button
+                      className={`item ${
+                        activeItemID === id && !itemIsExiting ? 'active' : null
+                      }`}
+                      onClick={() => setActiveItemID(id)}
+                    >
+                      <div className="item__grid">
+                        <div className="item__star">
+                          <Star filled={favorite ? true : false} />
+                        </div>
+                        <div className="item__text-stack">
+                          <h4 className="item__title">
+                            {title ? title : 'Untitled Doc'}
+                          </h4>
+                          <div className="item__subtitle">
+                            <span>{lastUpdatedBy}</span>
+                            <span> • </span>
+                            <span>
+                              {timeDifference(
+                                new Date(Date.now()),
+                                lastUpdated
+                              )}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
-                </CSSTransition>
-              )
-            )}
-          </TransitionGroup>
+                    </button>
+                  </CSSTransition>
+                )
+              )}
+            </TransitionGroup>
+          </div>
         </div>
       </div>
       {/* Middle */}
 
-      <div className="center-panel">
-        <div className="doc-page">
-          <TransitionGroup>
-            {itemsSortedByLastUpdated.map(({ id }) => {
-              if (id === activeItemID) {
-                return (
-                  <CSSTransition
-                    key={id}
-                    timeout={400}
-                    classNames="doc"
-                    // unmountOnExit
-                    onEntered={() => {
-                      console.log('entered', id);
-                    }}
-                    onEnter={() => console.log('enter', id)}
-                    onExit={() => console.log('exit', id)}
-                    onExited={() => {
-                      console.log('exited', id);
-                      // if (activeItem.id !== id) {
-                      //   setActiveItemID(itemsSortedByLastUpdated[0].id);
-                      // }
-                    }}
-                  >
-                    <div className="doc-content">
-                      <div className="doc__header">
-                        <input
-                          type="text"
-                          name="title"
-                          className="doc__title"
-                          id="title"
-                          value={activeItem.title}
-                          onChange={(e) => handleDocumentEdit(e)}
-                          placeholder="Doc title"
-                          autocomplete="off"
-                        />
-                        <div className="doc__details">
-                          <span>
-                            Last edited by {activeItem.lastUpdatedBy}
-                            {`  •  `}
-                            {timeDifference(
-                              new Date(Date.now()),
-                              activeItem.lastUpdated
-                            )}
-                          </span>
-                          <Star filled={activeItem.favorite ? true : false} />
-                          <button
-                            className="icon-button"
-                            onClick={() => removeItem(id)}
-                            style={{ display: 'inline' }}
-                          >
-                            <More />
-                          </button>
+      <div id="main">
+        <div className="center-panel">
+          <div className="doc-page">
+            <TransitionGroup>
+              {itemsSortedByLastUpdated.map(({ id }) => {
+                if (id === activeItemID) {
+                  return (
+                    <CSSTransition
+                      key={id}
+                      timeout={400}
+                      classNames="doc"
+                      // unmountOnExit
+                      onEntered={() => {
+                        console.log('entered', id);
+                      }}
+                      onEnter={() => console.log('enter', id)}
+                      onExit={() => console.log('exit', id)}
+                      onExited={() => {
+                        console.log('exited', id);
+                        // if (activeItem.id !== id) {
+                        //   setActiveItemID(itemsSortedByLastUpdated[0].id);
+                        // }
+                      }}
+                    >
+                      <div className="doc-content">
+                        <div className="doc__header">
+                          <input
+                            type="text"
+                            name="title"
+                            className="doc__title"
+                            id="title"
+                            value={activeItem.title}
+                            onChange={(e) => handleDocumentEdit(e)}
+                            placeholder="Doc title"
+                            autocomplete="off"
+                          />
+                          <div className="doc__details">
+                            <span>
+                              Last edited by {activeItem.lastUpdatedBy}
+                              {`  •  `}
+                              {timeDifference(
+                                new Date(Date.now()),
+                                activeItem.lastUpdated
+                              )}
+                            </span>
+                            <Star filled={activeItem.favorite ? true : false} />
+                            <button
+                              className="icon-button"
+                              onClick={() => removeItem(id)}
+                              style={{ display: 'inline' }}
+                            >
+                              <More />
+                            </button>
+                          </div>
                         </div>
+                        <textarea
+                          name="body"
+                          id="body"
+                          className="doc-body"
+                          value={activeItem.body}
+                          onChange={(e) => handleDocumentEdit(e)}
+                          spellCheck="false"
+                          placeholder="Type something..."
+                        >
+                          {activeItem.body}
+                        </textarea>
                       </div>
-                      <textarea
-                        name="body"
-                        id="body"
-                        className="doc-body"
-                        value={activeItem.body}
-                        onChange={(e) => handleDocumentEdit(e)}
-                        spellCheck="false"
-                        placeholder="Type something..."
-                      >
-                        {activeItem.body}
-                      </textarea>
-                    </div>
-                  </CSSTransition>
-                );
-              }
-            })}
-          </TransitionGroup>
+                    </CSSTransition>
+                  );
+                }
+              })}
+            </TransitionGroup>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function ToggleButton({ leftPanel, onClick }) {
+  return (
+    <button
+      data-tip={leftPanel ? 'Hide Docs' : 'Show Docs'}
+      id="toggle-button"
+      className="roundButton greyButton"
+      onClick={onClick}
+      style={{
+        padding: 0,
+        display: 'grid',
+        alignItems: 'center',
+        alignContent: 'center',
+      }}
+    >
+      <ReactTooltip
+        className="tooltip"
+        place="right"
+        type="dark"
+        effect="solid"
+        backgroundColor="black"
+        multiline={false}
+      />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto auto auto',
+          gap: 2,
+          alignContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <span
+          style={{
+            display: 'grid',
+            alignItems: 'center',
+            opacity: leftPanel ? 1 : 0,
+            transition: `opacity 80ms`,
+          }}
+        >
+          <Icons.TriangleLeft />
+        </span>
+        <Icons.Doc />
+        <span
+          style={{
+            display: 'grid',
+            alignItems: 'center',
+            opacity: leftPanel ? 0 : 1,
+            transition: `opacity 80ms`,
+          }}
+        >
+          <Icons.TriangleRight />
+        </span>
+      </div>
+    </button>
+  );
+}
+
+function NewDocButton({ leftPanel, onClick }) {
+  return (
+    <button
+      data-tip={'New Doc'}
+      id="new-doc-button"
+      className="roundButton blueButton"
+      onClick={onClick}
+      style={{
+        display: leftPanel && 'none',
+        opacity: leftPanel ? 0 : 1,
+        transition: `opacity 80ms`,
+      }}
+    >
+      <Icons.NewDoc />
+    </button>
   );
 }
 

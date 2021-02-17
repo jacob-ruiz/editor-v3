@@ -1,7 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
+:root {
+  --navbar-height: 52px;
+  --left-panel-width: 273px;
+  --left-panel-closed-visible: 40px;
+  --panel-transition-duration: 200ms;
+}
+
 body {
   margin: 0;
+  font-family: 'Poppins', sans-serif;
 }
 
 h1,
@@ -12,10 +20,12 @@ p {
   margin: 0;
 }
 
-.App {
-  font-family: 'Poppins', sans-serif;
+#layout {
   display: flex;
-  flex-direction: row;
+  overflow: hidden; /* Disable scrolling on layout */
+}
+#main {
+  flex-grow: 1;
 }
 
 button {
@@ -136,6 +146,12 @@ textarea {
   outline: none;
   padding: 4px 0;
 }
+.doc__title::placeholder {
+  transition: 80ms;
+}
+.doc__title:hover::placeholder {
+  opacity: 0.5;
+}
 .doc__header {
   border-bottom: 1px solid #eff0f2;
   padding-bottom: 24px;
@@ -171,12 +187,27 @@ textarea {
 }
 
 /* Styling */
-.left-panel {
-  width: 273px;
-  padding: 22px 12px;
+#left {
+  transition: width var(--panel-transition-duration);
+  width: 40px;
+  position: relative;
+}
+#left.open {
+  width: var(--left-panel-width);
   border-right: 1px solid #eff0f2;
 }
+.left-panel {
+  width: var(--left-panel-width);
+  padding: 22px 12px;
+  box-sizing: border-box;
+  transition: 200ms;
+}
+.left-panel.closed {
+  transform: translateX(-200px);
+  opacity: 0;
+}
 .left-panel__header {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 8px;
@@ -302,4 +333,47 @@ textarea {
 
 .button-icon-with-label:hover {
   background-color: #bfcbff;
+}
+
+#toggle-button {
+  position: absolute;
+  right: -16px;
+  top: 23px;
+  z-index: 100;
+}
+
+#new-doc-button {
+  position: absolute;
+  right: -16px;
+  top: 68px;
+  z-index: 100;
+}
+
+.roundButton {
+  border-radius: 999px;
+  border: none;
+  outline: none;
+  background: #eff0f2;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.greyButton {
+  background: #eff0f2;
+  transition: background 80ms;
+}
+.greyButton:hover {
+  background: #d3d6db;
+}
+
+.blueButton {
+  background: #e4e9ff;
+  transition: background 80ms;
+  color: #3c64fa;
+}
+.blueButton:hover {
+  background: #bfcbff;
 }
