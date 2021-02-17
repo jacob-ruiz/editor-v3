@@ -5,6 +5,7 @@ import ReactTooltip from 'react-tooltip';
 import Search from './components/Search/Search';
 import Icons from './icons';
 import './styles.css';
+import Navbar from './components/Navbar/Navbar';
 
 // http://reactcommunity.org/react-transition-group/transition-group
 
@@ -12,6 +13,7 @@ import './styles.css';
 
 // https://kentcdodds.com/blog/dont-sync-state-derive-it
 
+// https://github.com/davidde/sidebars
 /*
   TODO:
   - Try positioning items manually using transformY so we can animate to top of list on edit. (Maybe this is smarter to do at the end? This is a fairly radical approach and not very maintainable)
@@ -109,154 +111,161 @@ export default function App() {
   }
 
   return (
-    <div id="layout">
-      <div id="left" className={leftPanelOpen}>
-        <ToggleButton onClick={toggleLeftPanel} leftPanel={leftPanel} />
-        <NewDocButton onClick={addItem} leftPanel={leftPanel} />
-        <div className={`left-panel ${leftPanelOpen}`}>
-          <div className="left-panel__header">
-            <h3 className="left-panel__title">Docs</h3>
-            <button className="button-icon-with-label" onClick={addItem}>
-              <NewDoc />
-              New
-            </button>
-          </div>
-          <div className="left-panel__search-container">
-            <Search />
-          </div>
-          <div className="left-panel__filter-container">
-            <div className="left-panel__filter">
-              My Docs
-              <ArrowDown />
+    <>
+      <Navbar />
+      <div id="layout">
+        <div id="left" className={leftPanelOpen}>
+          <ToggleButton onClick={toggleLeftPanel} leftPanel={leftPanel} />
+          <NewDocButton onClick={addItem} leftPanel={leftPanel} />
+          <div className={`left-panel ${leftPanelOpen}`}>
+            <div className="left-panel__header">
+              <h3 className="left-panel__title">Docs</h3>
+              <button className="button-icon-with-label" onClick={addItem}>
+                <NewDoc />
+                New
+              </button>
             </div>
-            <div className="left-panel__sort">
-              <span>Last Edited</span>
-              <Sort />
+            <div className="left-panel__search-container">
+              <Search />
             </div>
-          </div>
-          <div>
-            <TransitionGroup className="list">
-              {itemsSortedByLastUpdated.map(
-                ({ id, title, lastUpdated, lastUpdatedBy, favorite }) => (
-                  <CSSTransition
-                    key={id}
-                    timeout={200}
-                    classNames="item"
-                    onExit={() => setItemIsExiting(true)}
-                    onExited={() => setItemIsExiting(false)}
-                  >
-                    <button
-                      className={`item ${
-                        activeItemID === id && !itemIsExiting ? 'active' : null
-                      }`}
-                      onClick={() => setActiveItemID(id)}
-                    >
-                      <div className="item__grid">
-                        <div className="item__star">
-                          <Star filled={favorite ? true : false} />
-                        </div>
-                        <div className="item__text-stack">
-                          <h4 className="item__title">
-                            {title ? title : 'Untitled Doc'}
-                          </h4>
-                          <div className="item__subtitle">
-                            <span>{lastUpdatedBy}</span>
-                            <span> • </span>
-                            <span>
-                              {timeDifference(
-                                new Date(Date.now()),
-                                lastUpdated
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  </CSSTransition>
-                )
-              )}
-            </TransitionGroup>
-          </div>
-        </div>
-      </div>
-      {/* Middle */}
-
-      <div id="main">
-        <div className="center-panel">
-          <div className="doc-page">
-            <TransitionGroup>
-              {itemsSortedByLastUpdated.map(({ id }) => {
-                if (id === activeItemID) {
-                  return (
+            <div className="left-panel__filter-container">
+              <div className="left-panel__filter">
+                My Docs
+                <ArrowDown />
+              </div>
+              <div className="left-panel__sort">
+                <span>Last Edited</span>
+                <Sort />
+              </div>
+            </div>
+            <div>
+              <TransitionGroup className="list">
+                {itemsSortedByLastUpdated.map(
+                  ({ id, title, lastUpdated, lastUpdatedBy, favorite }) => (
                     <CSSTransition
                       key={id}
-                      timeout={400}
-                      classNames="doc"
-                      // unmountOnExit
-                      onEntered={() => {
-                        console.log('entered', id);
-                      }}
-                      onEnter={() => console.log('enter', id)}
-                      onExit={() => console.log('exit', id)}
-                      onExited={() => {
-                        console.log('exited', id);
-                        // if (activeItem.id !== id) {
-                        //   setActiveItemID(itemsSortedByLastUpdated[0].id);
-                        // }
-                      }}
+                      timeout={200}
+                      classNames="item"
+                      onExit={() => setItemIsExiting(true)}
+                      onExited={() => setItemIsExiting(false)}
                     >
-                      <div className="doc-content">
-                        <div className="doc__header">
-                          <input
-                            type="text"
-                            name="title"
-                            className="doc__title"
-                            id="title"
-                            value={activeItem.title}
-                            onChange={(e) => handleDocumentEdit(e)}
-                            placeholder="Doc title"
-                            autocomplete="off"
-                          />
-                          <div className="doc__details">
-                            <span>
-                              Last edited by {activeItem.lastUpdatedBy}
-                              {`  •  `}
-                              {timeDifference(
-                                new Date(Date.now()),
-                                activeItem.lastUpdated
-                              )}
-                            </span>
-                            <Star filled={activeItem.favorite ? true : false} />
-                            <button
-                              className="icon-button"
-                              onClick={() => removeItem(id)}
-                              style={{ display: 'inline' }}
-                            >
-                              <More />
-                            </button>
+                      <button
+                        className={`item ${
+                          activeItemID === id && !itemIsExiting
+                            ? 'active'
+                            : null
+                        }`}
+                        onClick={() => setActiveItemID(id)}
+                      >
+                        <div className="item__grid">
+                          <div className="item__star">
+                            <Star filled={favorite ? true : false} />
+                          </div>
+                          <div className="item__text-stack">
+                            <h4 className="item__title">
+                              {title ? title : 'Untitled Doc'}
+                            </h4>
+                            <div className="item__subtitle">
+                              <span>{lastUpdatedBy}</span>
+                              <span> • </span>
+                              <span>
+                                {timeDifference(
+                                  new Date(Date.now()),
+                                  lastUpdated
+                                )}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <textarea
-                          name="body"
-                          id="body"
-                          className="doc-body"
-                          value={activeItem.body}
-                          onChange={(e) => handleDocumentEdit(e)}
-                          spellCheck="false"
-                          placeholder="Type something..."
-                        >
-                          {activeItem.body}
-                        </textarea>
-                      </div>
+                      </button>
                     </CSSTransition>
-                  );
-                }
-              })}
-            </TransitionGroup>
+                  )
+                )}
+              </TransitionGroup>
+            </div>
+          </div>
+        </div>
+        {/* Middle */}
+
+        <div id="main">
+          <div className="center-panel">
+            <div className="doc-page">
+              <TransitionGroup>
+                {itemsSortedByLastUpdated.map(({ id }) => {
+                  if (id === activeItemID) {
+                    return (
+                      <CSSTransition
+                        key={id}
+                        timeout={400}
+                        classNames="doc"
+                        // unmountOnExit
+                        onEntered={() => {
+                          console.log('entered', id);
+                        }}
+                        onEnter={() => console.log('enter', id)}
+                        onExit={() => console.log('exit', id)}
+                        onExited={() => {
+                          console.log('exited', id);
+                          // if (activeItem.id !== id) {
+                          //   setActiveItemID(itemsSortedByLastUpdated[0].id);
+                          // }
+                        }}
+                      >
+                        <div className="doc-content">
+                          <div className="doc__header">
+                            <input
+                              type="text"
+                              name="title"
+                              className="doc__title"
+                              id="title"
+                              value={activeItem.title}
+                              onChange={(e) => handleDocumentEdit(e)}
+                              placeholder="Doc title"
+                              autocomplete="off"
+                            />
+                            <div className="doc__details">
+                              <span>
+                                Last edited by {activeItem.lastUpdatedBy}
+                                {`  •  `}
+                                {timeDifference(
+                                  new Date(Date.now()),
+                                  activeItem.lastUpdated
+                                )}
+                              </span>
+                              <Star
+                                filled={activeItem.favorite ? true : false}
+                              />
+                              <button
+                                className="icon-button"
+                                onClick={() => removeItem(id)}
+                                style={{ display: 'inline' }}
+                              >
+                                <More />
+                              </button>
+                            </div>
+                          </div>
+                          <textarea
+                            name="body"
+                            id="body"
+                            className="doc-body"
+                            value={activeItem.body}
+                            onChange={(e) => handleDocumentEdit(e)}
+                            spellCheck="false"
+                            placeholder="Type something..."
+                          >
+                            {activeItem.body}
+                          </textarea>
+                        </div>
+                      </CSSTransition>
+                    );
+                  }
+                })}
+              </TransitionGroup>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
