@@ -7,6 +7,15 @@
   --panel-transition-duration: 100ms;
 }
 
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -26,8 +35,17 @@ p {
 }
 #main {
   flex-grow: 1;
-  max-width: 700px;
+  /* max-width: 700px; */
   overflow: visible;
+  min-width: 500px;
+  width: 100%;
+}
+
+#right {
+  min-width: 438px;
+}
+
+.right-panel {
 }
 
 button {
@@ -113,13 +131,13 @@ textarea {
   transform: translateY(8px);
   transform-origin: top center;
   transition: opacity 200ms, transform 200ms cubic-bezier(0.55, 0, 1, 0.45);
-  /* transition: opacity 200ms, transform 200ms ease-in; */
 }
 
 .center-panel {
   position: relative;
   min-width: 400px;
-  max-width: 700px;
+  max-width: 1200px;
+  margin: 0 auto;
   box-sizing: border-box;
   width: 100%;
   padding-left: 50px;
@@ -188,6 +206,7 @@ textarea {
   line-height: 30px;
   overflow: hidden;
   resize: none;
+  height: 800px;
 }
 
 /* Styling */

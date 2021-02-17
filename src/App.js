@@ -6,6 +6,7 @@ import Search from './components/Search/Search';
 import Icons from './icons';
 import './styles.css';
 import Navbar from './components/Navbar/Navbar';
+import SuggestionsPanel from './components/SuggestionsPanel/SuggestionsPanel';
 
 // http://reactcommunity.org/react-transition-group/transition-group
 
@@ -32,32 +33,32 @@ export default function App() {
   const [items, setItems] = useState([
     {
       id: uuid(),
-      title: randomFromArray(titles),
-      body: randomFromArray(bodies),
+      title: content[0].title,
+      body: content[0].body,
       lastUpdated: new Date(Date.now()),
       lastUpdatedBy: 'Jacob Ruiz',
       favorite: false,
     },
     {
       id: uuid(),
-      title: randomFromArray(titles),
-      body: randomFromArray(bodies),
+      title: content[1].title,
+      body: content[1].body,
       lastUpdated: new Date(Date.now()),
       lastUpdatedBy: 'Jacob Ruiz',
       favorite: true,
     },
     {
       id: uuid(),
-      title: randomFromArray(titles),
-      body: randomFromArray(bodies),
+      title: content[2].title,
+      body: content[2].body,
       lastUpdated: new Date(Date.now()),
       lastUpdatedBy: 'Jacob Ruiz',
       favorite: false,
     },
     {
       id: uuid(),
-      title: randomFromArray(titles),
-      body: randomFromArray(bodies),
+      title: content[3].title,
+      body: content[3].body,
       lastUpdated: new Date(Date.now()),
       lastUpdatedBy: 'Jacob Ruiz',
       favorite: false,
@@ -262,6 +263,12 @@ export default function App() {
                 })}
               </TransitionGroup>
             </div>
+          </div>
+        </div>
+
+        <div id="right">
+          <div className="right-panel">
+            <SuggestionsPanel />
           </div>
         </div>
       </div>
@@ -510,3 +517,24 @@ function timeDifference(current, previous) {
     return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
   }
 }
+
+const content = [
+  {
+    title: 'Kind words at work',
+    body: `The pandemic turned work-life on its head. We’re caught in the tumble load of a never-ending workday, pinballing between Zoom and Slack, duking it out with the family for WiFi, dishes piling up around us in our office…er…kitchen, and just trying to hold it together while we just. take. a. minute. to. remember. what. day. it. is. It’s a high-stress moment. That stress shows up at work, especially in how we talk to each other. Indeed, more than one-third of us has been on the receiving end of toxic workplace communication since the lockdown started, with almost 20 percent experiencing hostility related to how we’re balancing work and life at the moment. If there were ever a time for us to pull together and be more empathetic, it’s now. Here’s your checklist for how you can get started in your next email, chat message, or video conversation. The most empathetic thing you can do for your colleagues is communicate clearly. Be short, sweet, and very clear. Really knock it out of the park with a “TL;DR” (a quick summary) at the beginning of every message. Your co-workers will want to hug you (in a socially-distanced way, of course).
+    `,
+  },
+  {
+    title: 'A comprehensive guide to the AP style of writing',
+    body: `Associated Press (AP) style is the go-to English style and usage guide for journalism and news writing, such as magazines and newspapers. AP style dictates basic rules for grammar and punctuation, as well as specific styles for numbers, spelling, capitalization, abbreviations, acronyms, and much more. The ins and outs of AP style can be found within the “Associated Press Stylebook and Briefing on Media Law.”. While the AP Styleguide was originally sold as a handbook for reporters, it’s rapidly become the leading reference for the majority of public-facing communication, including websites, white papers, and press releases to reflect new additions to the English language or address common verbiage seen in the media. For instance, the latest edition included new or revised entries for digital wallets, smart devices, and the novel coronavirus. If you’re ever in doubt about acceptable word use or modern jargon, the styleguide is continuously refreshed to keep up with trends.`,
+  },
+  {
+    title: 'What is grammar?',
+    body: `As long as there have been rules of grammar, there have been theories about what makes it work and how to classify it. For example, American linguist Noam Chomsky posited the theory of universal grammar. It says that common rules dictate all language. In his view, humans have an innate knowledge of language that informs those rules. That, he reasoned, is why children can pick up on complex grammar without explicit knowledge of the rules. But grammarians still debate about whether this theory holds true.`,
+  },
+  {
+    title:
+      'AI for beginners: What are artificial intelligence, machine learning, deep learning, and natural language processing?',
+    body: `Here’s a challenge: define artificial intelligence and list some examples of AI technology. Then ask your coworker, a friend, or a stranger to do the same. I’ll bet your definitions and examples of AI don’t match. They may be closely related, but it’s pretty typical for people to have different takes on what does and doesn’t count as AI.`,
+  },
+];
